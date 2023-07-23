@@ -1,12 +1,15 @@
 import pygame
 import sys
+from File_Creator import File_Creator
 from Level_Map import Level_Map
 
 from Select_Panel import Select_Panel
+from Types import TypeList
 
 FPS = 60
 WIDTH = 1280
 HEIGHT = 720
+CURRENT_ITEM: int = 1
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -17,6 +20,7 @@ clock = pygame.time.Clock()
 
 panel = Select_Panel(0, 656)
 level_map = Level_Map(0, 0)
+file_creator = File_Creator()
 
 
 def update():
@@ -35,9 +39,14 @@ while True:
             pygame.quit()
             sys.exit()
 
+        #!!!!!!!
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
-                level_map.check_collide(event.pos)
+                level_map.check_collide(
+                    event.pos, TypeList.items_id[TypeList.CURRENT_ITEM_ID])
+                panel.check_collide(event.pos)
+            if event.button == 3:
+                level_map.check_collide_delete(event.pos)
 
         if event.type == pygame.MOUSEWHEEL:
             pos = pygame.mouse.get_pos()
@@ -45,6 +54,11 @@ while True:
                 panel.check_scroll(pos, "left")
             else:
                 panel.check_scroll(pos, "right")
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_s:
+                file_creator.load_items(level_map.get_items())
+                file_creator.create_lvl()
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
